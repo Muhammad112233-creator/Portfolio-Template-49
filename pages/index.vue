@@ -1,0 +1,47 @@
+<script setup>
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+const chapters = ['THE BEGINNING','THE PRACTICE','THE WORK','THE PROCESS','IN MOTION','THE SIGNAL','THE RETURN']
+const active = ref(0), loaded = ref(false), tvOn = ref(true), brightness = ref(100), hue = ref(0), grayscale = ref(0), blur = ref(0)
+let ctx, mm
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger)
+  setTimeout(() => loaded.value = true, 700)
+  ctx = gsap.context(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    document.querySelectorAll('.chapter').forEach((section, i) => {
+      ScrollTrigger.create({trigger: section, start:'top center', end:'bottom center', onToggle: s => { if(s.isActive) active.value = i }})
+      if (!reduceMotion) gsap.fromTo(section.querySelectorAll('.reveal'), {y: 65, opacity:0}, {y:0, opacity:1, stagger:.15, duration:1, ease:'power3.out', scrollTrigger:{trigger:section,start:'top 75%'}})
+    })
+    mm = gsap.matchMedia()
+    mm.add('(min-width: 701px) and (prefers-reduced-motion: no-preference)', () => {
+      gsap.utils.toArray('.chapter').forEach((section) => {
+        if (section.id === 'return') return
+        ScrollTrigger.create({trigger:section, start:'top top', end:'+=45%', pin:true, pinSpacing:true, anticipatePin:1})
+      })
+    })
+    if (!reduceMotion) gsap.to('.planet', {rotation: -100, ease:'none', scrollTrigger:{trigger:'#motion',start:'top bottom',end:'bottom top',scrub:1}})
+    if (!reduceMotion) gsap.to('.rocket', {y:-100, rotation:5, ease:'none', scrollTrigger:{trigger:'#motion',start:'top bottom',end:'bottom top',scrub:1}})
+  })
+})
+onBeforeUnmount(() => { mm?.revert(); ctx?.revert() })
+function jump(i){ document.querySelectorAll('.chapter')[i]?.scrollIntoView({behavior:'smooth'}) }
+</script>
+<template>
+  <div class="site" :class="{ready:loaded}">
+    <div v-if="!loaded" class="preloader"><div class="preload-mark">✳</div><p>PREPARING FOR TAKEOFF</p></div>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="header"><NuxtLink class="play-stamp" to="/game" aria-label="Play the orbit game"><span>PLAY</span><small>✦ A LITTLE GAME ✦</small></NuxtLink><a class="header-logo" href="#top" aria-label="Back to top"><span>✳</span><small>ORBIT<br>STUDIO</small></a><a class="postage" href="mailto:hello@example.com" aria-label="Email Orbit Studio"><span>✷</span><small>GOOD IDEAS<br>TRAVEL FAR</small></a></header>
+    <nav class="chapter-nav" aria-label="Chapters"><div class="nav-title">CONTENTS</div><button v-for="(chapter,i) in chapters" :key="chapter" :class="{selected:active===i}" @click="jump(i)"><span>0{{ i+1 }}</span><span>{{ chapter }}</span></button></nav>
+    <main id="top">
+      <section class="chapter hero" id="beginning"><div class="hero-paper reveal"><div class="paper-top"><span>THE INDEPENDENT CREATIVE JOURNAL</span><span>VOL. 01 · EST. 2024</span></div><h1>THE ORBIT<br><i>STUDIO</i> TIMES</h1><div class="paper-meta"><span>DESIGN & TECHNOLOGY</span><span>A PORTFOLIO IN SEVEN CHAPTERS</span><span>ISSUE NO. 001</span></div><div class="paper-grid"><div class="paper-side"><h3>IDEAS ARE<br>MEANT TO<br>TRAVEL.</h3><p>A small studio with a big curiosity. We make thoughtful digital experiences for people, not just screens.</p><div class="asterisk">✳</div><p>AN INDEPENDENT PRACTICE<br>AVAILABLE WORLDWIDE</p></div><div class="hero-image"><img src="~/public/assets/hero-studio.webp" alt="A creative workshop, imagined as an archival photograph"><div class="image-caption">A LOOK INSIDE THE STUDIO &nbsp; / &nbsp; FIG. 01</div></div><div class="paper-side right-side"><p>THE ART OF<br>MAKING THINGS<br>MATTER.</p><div class="stamp-circle">A NOTE<br>FROM THE<br>STUDIO ✦</div><p>Made with care, curiosity and a healthy appetite for the unknown.</p></div></div><div class="paper-footer"><span>DESIGN · DEVELOPMENT · DIRECTION</span><span>SCROLL TO EXPLORE ↓</span></div></div><div class="side-note">A PORTFOLIO<br>IN MOTION ↘</div></section>
+      <section class="chapter practice" id="practice"><div class="section-heading reveal"><span>CHAPTER 02 / THE PRACTICE</span><h2>Curiosity is<br><em>our compass.</em></h2><p>Good work begins with a question. Better work begins when we keep asking.</p></div><div class="principles reveal"><article><span>01 / THINK</span><div class="symbol">✺</div><h3>Make it meaningful</h3><p>We listen first, uncover the real problem, and find the idea worth building.</p></article><article><span>02 / MAKE</span><div class="symbol">✳</div><h3>Make it beautiful</h3><p>Distinctive design with warmth, character, and a little unexpected magic.</p></article><article><span>03 / LAUNCH</span><div class="symbol">✦</div><h3>Make it work</h3><p>Thoughtful engineering turns ambitious ideas into things people can use.</p></article></div><div class="chapter-card"><span>02 / 07</span><p>Every good journey starts with a little curiosity.</p></div></section>
+      <section class="chapter work" id="work"><div class="section-heading reveal"><span>CHAPTER 03 / THE WORK</span><h2>Two sides of<br><em>the same idea.</em></h2><p>Craft and code, working better together.</p></div><div class="polaroids reveal"><article><img src="~/public/assets/pillar-design.webp" alt="Typography and tools on a design desk"><div><span>01 / DESIGN</span><h3>Made to be felt.</h3><p>Identity, art direction & digital design.</p></div></article><article><img src="~/public/assets/pillar-code.webp" alt="Analog electronics on a workshop bench"><div><span>02 / DEVELOPMENT</span><h3>Built to move.</h3><p>Creative development & interaction.</p></div></article></div><div class="chapter-card"><span>03 / 07</span><p>A little precision. A lot of personality.</p></div></section>
+      <section class="chapter process" id="process"><div class="section-heading reveal"><span>CHAPTER 04 / THE PROCESS</span><h2>From a spark<br><em>to something real.</em></h2><p>No secret formula. Just good people, good questions, and a lot of making.</p></div><div class="orbit-diagram reveal"><OrbitScene /><div class="orbit-label label-a">01<br>DISCOVER</div><div class="orbit-label label-b">02<br>DESIGN</div><div class="orbit-label label-c">03<br>DEVELOP</div><div class="orbit-label label-d">04<br>DELIVER</div></div><div class="chapter-card"><span>04 / 07</span><p>Thoughtful work is never a straight line.</p></div></section>
+      <section class="chapter motion" id="motion"><div class="stars" aria-hidden="true"></div><div class="section-heading reveal"><span>CHAPTER 05 / IN MOTION</span><h2>A little further<br><em>than expected.</em></h2><p>We believe the most memorable experiences invite you to explore.</p><NuxtLink to="/game" class="outline-link">TAKE A LITTLE DETOUR ↗</NuxtLink></div><div class="planet"><div class="land l1"></div><div class="land l2"></div><div class="land l3"></div></div><div class="rocket"><span>✦</span><div class="rocket-body">✳</div><div class="flame">♨</div></div><div class="chapter-card dark-card"><span>05 / 07</span><p>For ideas that refuse to stay on the ground.</p></div></section>
+      <section class="chapter signal" id="signal"><div class="section-heading reveal"><span>CHAPTER 06 / THE SIGNAL</span><h2>Coming in<br><em>loud & clear.</em></h2><p>A creative practice tuned to the details.</p></div><div class="tv reveal"><div class="tv-screen" :class="{off:!tvOn}" :style="{filter:`brightness(${brightness}%) hue-rotate(${hue}deg) grayscale(${grayscale}%) blur(${blur}px)`}"><div class="screen-stars">✦ &nbsp; ✧ &nbsp; ✦</div><div class="screen-logo">✳</div><p>GOOD IDEAS<br>TRAVEL FAR</p><small>TRANSMITTING FROM ORBIT STUDIO</small></div><div class="tv-controls"><button @click="tvOn=!tvOn" :aria-label="tvOn ? 'Turn television off' : 'Turn television on'" class="power">{{tvOn?'●':'○'}}</button><label>LIGHT<input v-model="brightness" type="range" min="40" max="160"></label><label>COLOR<input v-model="hue" type="range" min="0" max="360"></label><label>MONO<input v-model="grayscale" type="range" min="0" max="100"></label><label>FOCUS<input v-model="blur" type="range" min="0" max="5" step="0.1"></label><span class="speaker">≋<br>≋<br>≋</span></div></div><div class="chapter-card dark-card"><span>06 / 07</span><p>Stay curious. Stay connected.</p></div></section>
+      <section class="chapter return" id="return"><div class="return-paper reveal"><div class="paper-top"><span>THE INDEPENDENT CREATIVE JOURNAL</span><span>THE FINAL EDITION</span></div><h2>BACK DOWN<br><em>TO EARTH.</em></h2><div class="paper-meta"><span>THE END OF ONE JOURNEY</span><span>THE BEGINNING OF ANOTHER</span></div><img src="~/public/assets/return-keynote.webp" alt="An imagined creative exhibition"><div class="return-columns"><h3>Good work is<br>only the beginning.</h3><div><p>Thanks for spending a little time in our orbit. Whether you have a big idea, a small question, or something in between, we'd love to hear about it.</p><a href="mailto:hello@example.com">SAY HELLO ↗</a></div></div><div class="credits"><span>CREATIVE DIRECTION<br><b>YOUR NAME</b></span><span>DESIGN & DEVELOPMENT<br><b>YOUR NAME</b></span><span>MADE WITH<br><b>CURIOSITY</b></span></div></div><footer><span>© ORBIT STUDIO 2024—2026</span><a href="#top">BACK TO THE TOP ↑</a><span>MADE FOR THE CURIOUS ✳</span></footer></section>
+    </main><div class="scroll-cue" v-if="active===0">SCROLL TO DISCOVER <span>↓</span></div>
+  </div>
+</template>

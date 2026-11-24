@@ -1,0 +1,1 @@
+<template><main class="game error-page"><div class="stars"></div><div><span class="error-star">✳</span><h1>LOST IN SPACE?</h1><p>Looks like this page drifted out of orbit.</p><a href="/">← RETURN TO EARTH</a></div></main></template>
